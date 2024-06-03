@@ -20,4 +20,7 @@ pub enum ContractError {
 
     #[error("Asset Not Found")]
     AssetNotFound { token_id : String},
+
+    #[error("Minter value not found")]
+    MinterValueNotFound{},
 }
