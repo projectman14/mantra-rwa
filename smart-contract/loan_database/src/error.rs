@@ -26,4 +26,10 @@ pub enum ContractError {
 
     #[error("SubMsgFailure")]
     SubMsgFailure{},
+
+    #[error("No Contract Address in Reply")]
+    NoContractAddressInReply{},
+
+    #[error("No Field {field} in Reply")]
+    NoFieldInReply{ field : String },
 }
