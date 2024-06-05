@@ -1,15 +1,18 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Addr, Uint64, WasmMsg};
+use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Addr, Uint64, ReplyOn, WasmMsg, SubMsg, Reply};
+use cw_utils::parse_instantiate_response_data;
+
 use cw2::set_contract_version;
 use execute::{change_loan_contract_status, mint_loan_contract};
+use cosmwasm_schema::cw_serde;
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, LoanInfos, DateTime};
-use crate::state::{CONTRACTS, ADMINS, MINTER};
+use crate::state::{LoanContract, ADMINS, CONTRACTS, MINTER};
 
 // version info for migration info
-const CONTRACT_NAME: &str = "crates.io:nft-ownership";
+const CONTRACT_NAME: &str = "crates.io:loan_database";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -32,21 +35,53 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg{
         ExecuteMsg::MintLoanContract { borrower, token_uri, borrowed_amount, interest, expiration_date } => mint_loan_contract(deps, borrower, token_uri, borrowed_amount, interest, expiration_date),
-        ExecuteMsg::ChangeLoanContractStatus { borrower, token_uri, status_code } => change_loan_contract_status(deps, info, borrower, status_code),
+        ExecuteMsg::ChangeLoanContractStatus { borrower, status_code } => change_loan_contract_status(deps, info, borrower, status_code),
     }
 }
 
 pub mod execute {
     use super::*;
 
-    pub fn mint_loan_contract(deps: DepsMut, borrower : Addr, token_uri : String, borrowed_amount : Uint64, interest : Uint64, expiration_date : DateTime){
+    #[cw_serde]
+    pub struct LoanInstantiate{
+        pub database_address: Addr,
+        pub borrower : Addr,
+        pub token_uri : String,
+        pub borrowed_amount : Uint64,
+        pub interest : Uint64,
+        pub expiration_date : DateTime,
+    }
+
+    pub fn mint_loan_contract(deps: DepsMut, env : Env, borrower : Addr, token_uri : String, borrowed_amount : Uint64, interest : Uint64, expiration_date : DateTime) -> Result<Respone, ContractError>{
         let minter_code_id = MINTER.may_load(deps.storage)?;
 
         match minter_code_id{
             None => Err(ContractError::MinterValueNotFound {  }),
             Some(minter_code_id) =>{
-                let mintMsg = WasmMsg::Instantiate { admin: None, code_id: minter_code_id, msg: (), funds: vec![], label: format!("Loan contract instantiate with borrower {borrower} and collateral {token_uri}").to_string() };
-                unimplemented!()
+                let instantiate_msg = LoanInstantiate{
+                    database_address : env.contract.address,
+                    borrower,
+                    token_uri,
+                    borrowed_amount,
+                    interest,
+                    expiration_date,
+                };
+
+                let mint_msg = SubMsg{ 
+                    msg : WasmMsg::Instantiate { 
+                    admin: None, 
+                    code_id: MINTER.load(deps.storage)?, 
+                    msg: to_json_binary(&instantiate_msg)?, 
+                    funds: vec![], 
+                    label: format!("Loan contract for borrower {borrower} with collateral {token_uri}").to_string() 
+                }.into(),
+                id : 1,
+                gas_limit : None,
+                reply_on : ReplyOn::Success,
+                payload : None,
+            };
+
+                Ok(Response::new().add_submessage(mint_msg))
             }
         }
     }
@@ -76,6 +111,15 @@ pub mod execute {
     }
 }
 
+
+#[cfg_attr(not(feature = "library"), entry_point)]
+pub fn reply(deps: DepsMut, env: Env, msg: Reply) -> Result<Response, ContractError> {
+    let reply = parse_instantiate_response_data(&msg.result.into_result().unwrap().msg_responses[0].value);
+}
+
+
+
+
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn query(deps: Deps,
     _env: Env,
@@ -97,15 +141,9 @@ pub mod query {
         };
 
         Ok(loan_contracts)
-        
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use cosmwasm_std::testing::{mock_dependencies, mock_env, mock_info};
-    use cosmwasm_std::{coins, from_json};
-
-    
 }

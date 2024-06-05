@@ -23,4 +23,7 @@ pub enum ContractError {
 
     #[error("Minter value not found")]
     MinterValueNotFound{},
+
+    #[error("SubMsgFailure")]
+    SubMsgFailure{},
 }

@@ -1,10 +1,13 @@
-use cosmwasm_std::{to_json_binary, Addr, CosmosMsg, StdResult, WasmMsg, Deps};
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
-use cosmwasm_schema::cw_serde;
+use cosmwasm_std::{to_json_binary, Addr, CosmosMsg, StdResult, WasmMsg};
 
 use crate::msg::ExecuteMsg;
 
-#[cw_serde]
+/// CwTemplateContract is a wrapper around Addr that provides a lot of helpers
+/// for working with this.
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct CwTemplateContract(pub Addr);
 
 impl CwTemplateContract {
@@ -20,12 +23,5 @@ impl CwTemplateContract {
             funds: vec![],
         }
         .into())
-    }
-}
-
-fn check_addr(deps : Deps , address : Addr) -> bool{
-    match deps.api.addr_validate(address.as_str()) {
-        Ok(checked) => true,
-        Err(_) => false,
     }
 }
