@@ -7,8 +7,8 @@ use execute::{change_loan_contract_status, mint_loan_contract};
 use cosmwasm_schema::cw_serde;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, LoanInfos, DateTime};
-use crate::state::{LoanContract, CONTRACTS, MINTER};
+use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, LoanInfos};
+use crate::state::{LoanContract, CONTRACTS, MINTER, ADMINS};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:loan_database";
@@ -19,10 +19,15 @@ pub fn instantiate(
     deps: DepsMut,
     _env: Env,
     _info: MessageInfo,
-    _msg: InstantiateMsg,
+    msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
-    unimplemented!()
+    
+    ADMINS.save(deps.storage, &msg.admins)?;
+
+    MINTER.save(deps.storage, &msg.minter)?;
+
+    Ok(Response::new().add_attribute("action", "Instantiate").add_attribute("Minter", msg.minter.to_string()))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -33,7 +38,7 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg{
-        ExecuteMsg::MintLoanContract { borrower, token_uri, borrowed_amount, interest, expiration_date } => mint_loan_contract(deps, env, borrower, token_uri, borrowed_amount, interest, expiration_date),
+        ExecuteMsg::MintLoanContract { borrower, token_uri, borrowed_amount, interest, days_before_expiration } => mint_loan_contract(deps, env, borrower, token_uri, borrowed_amount, interest, days_before_expiration),
         ExecuteMsg::ChangeLoanContractStatus { borrower, status_code } => change_loan_contract_status(deps, info, borrower, status_code),
     }
 }
@@ -48,10 +53,10 @@ pub mod execute {
         pub token_uri : String,
         pub borrowed_amount : Uint64,
         pub interest : Uint64,
-        pub expiration_date : DateTime,
+        pub days_before_expiration : u64,
     }
 
-    pub fn mint_loan_contract(deps: DepsMut, env : Env, borrower : Addr, token_uri : String, borrowed_amount : Uint64, interest : Uint64, expiration_date : DateTime) -> Result<Response, ContractError>{
+    pub fn mint_loan_contract(deps: DepsMut, env : Env, borrower : Addr, token_uri : String, borrowed_amount : Uint64, interest : Uint64, days_before_expiration : u64) -> Result<Response, ContractError>{
         let minter_code_id = MINTER.may_load(deps.storage)?;
 
         match minter_code_id{
@@ -63,7 +68,7 @@ pub mod execute {
                     token_uri : token_uri.clone(),
                     borrowed_amount,
                     interest,
-                    expiration_date,
+                    days_before_expiration,
                 };
 
                 let mint_msg = SubMsg{ 

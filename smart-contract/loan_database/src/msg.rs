@@ -6,22 +6,13 @@ use crate::state::LoanContract;
 #[cw_serde]
 pub struct InstantiateMsg {
     pub admins : Vec<Addr>,
-    pub minter : Addr,
+    pub minter : u64,
 }
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    MintLoanContract{ borrower : Addr, token_uri : String, borrowed_amount : Uint64, interest : Uint64, expiration_date : DateTime},
+    MintLoanContract{ borrower : Addr, token_uri : String, borrowed_amount : Uint64, interest : Uint64, days_before_expiration : u64},
     ChangeLoanContractStatus{ borrower : Addr, status_code : Uint64 },
-}
-
-#[cw_serde]
-pub struct DateTime{
-    date : Uint64,
-    month : Uint64,
-    year : Uint64,
-    hour : Uint64,
-    minute : Uint64,
 }
 
 #[cw_serde]

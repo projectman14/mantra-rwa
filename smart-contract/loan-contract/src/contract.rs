@@ -7,9 +7,7 @@ use cosmwasm_schema::cw_serde;
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
-use crate::state::{ContractInfo, DateTime, CONTRACT_INFO, CW20_ADDRESS, DATABASE_ADDRESS};
-
-use chrono::{Datelike, Local, Timelike};
+use crate::state::{ContractInfo, CONTRACT_INFO, CW20_ADDRESS, DATABASE_ADDRESS};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:loan-contract";
@@ -19,29 +17,19 @@ const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     _info: MessageInfo,
     msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
-
-    let current_time = Local::now();
-
-    let start_time = DateTime{
-        date : Uint64::new(current_time.day().into()),
-        month : Uint64::new(current_time.month().into()),
-        year : Uint64::new(current_time.year().try_into().unwrap()),
-        hour : Uint64::new(current_time.hour().into()),
-        minute : Uint64::new(current_time.minute().into()),
-    };
 
     let contract_info = ContractInfo{
         borrower : msg.borrower,
         token_uri : msg.token_uri,
         borrowed_amount : msg.borrowed_amount,
         interest : msg.interest,
-        start_date : start_time,
-        expiration_date : msg.expiration_date,
+        start_date : env.block.time,
+        expiration_date : env.block.time.plus_days(msg.days_before_expiration),
         currently_paid : Uint64::new(0),
     };
 
@@ -70,6 +58,8 @@ pub fn execute(
 }
 
 pub mod execute{
+    use cosmwasm_std::Timestamp;
+
     use super::*;
 
     #[cw_serde]
@@ -81,7 +71,7 @@ pub mod execute{
     pub fn accept_payment(deps : DepsMut, payment : Uint64) -> Result<Response, ContractError> {
         let mut contract_info = CONTRACT_INFO.load(deps.storage)?;
 
-        let diff_year = contract_info.start_date.diff_in_days(&contract_info.expiration_date);
+        let diff_year = Uint64::new(Timestamp::from_seconds(contract_info.expiration_date.seconds() - contract_info.start_date.seconds()).seconds() / 31536000);
 
         let max_pay = ((contract_info.borrowed_amount * contract_info.interest * diff_year) / Uint64::new(100)) - contract_info.currently_paid;
 

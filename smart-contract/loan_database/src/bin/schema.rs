@@ -1,6 +1,6 @@
 use cosmwasm_schema::write_api;
 
-use nft_ownership::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
+use loan_database::msg::{ExecuteMsg, InstantiateMsg, QueryMsg};
 
 fn main() {
     write_api! {
