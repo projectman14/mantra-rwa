@@ -1,5 +1,5 @@
 [package]
-name = "loan-database"
+name = "loan-contract"
 version = "0.1.0"
 authors = ["B1smuth <siddharthaswarnkar@gmail.com>"]
 edition = "2021"

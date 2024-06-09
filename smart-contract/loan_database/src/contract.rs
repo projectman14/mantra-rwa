@@ -3,6 +3,7 @@ use cosmwasm_std::entry_point;
 use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Addr, Uint64, ReplyOn, WasmMsg, SubMsg, Reply};
 
 use cw2::set_contract_version;
+use cw_utils::parse_reply_instantiate_data;
 use execute::{change_loan_contract_status, mint_loan_contract};
 use cosmwasm_schema::cw_serde;
 
@@ -82,7 +83,6 @@ pub mod execute {
                 id : 1,
                 gas_limit : None,
                 reply_on : ReplyOn::Success,
-                payload : Binary::new(vec![]),
             };
 
                 Ok(Response::new().add_submessage(mint_msg))
@@ -118,37 +118,50 @@ pub mod execute {
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn reply(deps: DepsMut, _env: Env, msg: Reply) -> Result<Response, ContractError> {
-    let message_response = msg.result.into_result().unwrap().msg_responses;
-    let contract_address_pos = message_response.iter().position(|x| x.type_url == "contract_address".to_string());
-    let borrower_pos = message_response.iter().position(|x| x.type_url == "borrower".to_string());
+    let reply = parse_reply_instantiate_data(msg.to_owned()).unwrap();
 
-    match contract_address_pos{
-        None => Err(ContractError::NoFieldInReply { field: "contract_address".to_string() }),
-        Some(contract_address_pos)=>{
-            
-            match borrower_pos{
-                None => Err(ContractError::NoFieldInReply{ field : "borrower".to_string()}),
-                Some(borrower_pos) => {
-                    let contract_address = Addr::unchecked(String::from_utf8_lossy(message_response[contract_address_pos].value.as_slice()));
-                    let borrower = Addr::unchecked(String::from_utf8_lossy(message_response[borrower_pos].value.as_slice()));
+    let contract_address = Addr::unchecked(reply.contract_address);
 
-                    let mut loan_info = CONTRACTS.load(deps.storage, borrower.clone())?;
+    let events = msg.result.into_result().unwrap().events;
+    
+    let wasm_event = events.iter().find(|x| x.ty == "wasm".to_string());
+
+    match wasm_event {
+        None => Err(ContractError::NoFieldInReply { field: "wasm".to_string() }),
+        Some(wasm_event) => {
+            let borrower_attri = wasm_event.attributes.iter().find(|x| x.key == "borrower".to_string());
+
+            match borrower_attri {
+                None => Err(ContractError::NoFieldInReply { field: "borrower".to_string() }),
+                Some(borrower_attri) => {
+                    let borrower = Addr::unchecked(borrower_attri.value.to_owned());
+
                     let loan_contract = LoanContract{
-                        address : contract_address.clone(),
+                        address : contract_address.to_owned(),
                         status_code : Uint64::new(0),
                     };
 
-                    loan_info.push(loan_contract);
+                    let contract_info = CONTRACTS.may_load(deps.storage, borrower.to_owned())?;
 
-                    CONTRACTS.save(deps.storage, borrower.clone(), &loan_info)?;
+                    match contract_info {
+                        None => {
+                            let loan_vec = vec![loan_contract];
+
+                            CONTRACTS.save(deps.storage, borrower.to_owned(), &loan_vec)?;
+                        },
+                        Some(mut contract_info) => {
+                            contract_info.push(loan_contract);
+
+                            CONTRACTS.save(deps.storage, borrower.to_owned(), &contract_info)?;
+                        }
+                    }
 
                     Ok(Response::new()
-                        .add_attribute("action", "add contract address")
-                        .add_attribute("borrower", borrower.clone())
-                        .add_attribute("contract_address", contract_address.clone()))
+                        .add_attribute("action", "Add minted contract address")
+                        .add_attribute("borrower", borrower)
+                        .add_attribute("contract_address", contract_address))
                 }
             }
-            
         }
     }
     

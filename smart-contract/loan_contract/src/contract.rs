@@ -24,8 +24,8 @@ pub fn instantiate(
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
 
     let contract_info = ContractInfo{
-        borrower : msg.borrower,
-        token_uri : msg.token_uri,
+        borrower : msg.borrower.to_owned(),
+        token_uri : msg.token_uri.to_owned(),
         borrowed_amount : msg.borrowed_amount,
         interest : msg.interest,
         start_date : env.block.time,
@@ -42,7 +42,13 @@ pub fn instantiate(
     DATABASE_ADDRESS.save(deps.storage, &database_address)?;
 
     Ok(Response::new()
-        .add_attribute("action", "instantiate"))
+        .add_attribute("action", "instantiate")
+        .add_attribute("borrower", msg.borrower.to_string())
+        .add_attribute("token_uri", msg.token_uri.to_string())
+        .add_attribute("borrowed_amount", msg.borrowed_amount)
+        .add_attribute("interest", msg.interest)
+        .add_attribute("start_date", env.block.time.to_string())
+        .add_attribute("expiration_date", env.block.time.plus_days(msg.days_before_expiration).to_string()))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
