@@ -14,4 +14,7 @@ pub enum ContractError {
 
     #[error("Expiration date crossed")]
     ExpirationDateCrossed {},
+
+    #[error("Loan already paid back")]
+    PaidBack {},
 }

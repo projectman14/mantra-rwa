@@ -4,7 +4,6 @@ use cosmwasm_std::{to_json_binary, WasmQuery, Binary, Deps, DepsMut, Env, Messag
 
 use cw2::set_contract_version;
 use cw_utils::parse_reply_instantiate_data;
-use execute::{add_token_address, change_loan_contract_status, mint_loan_contract};
 use cosmwasm_schema::cw_serde;
 
 use crate::error::ContractError;
@@ -39,9 +38,10 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg{
-        ExecuteMsg::MintLoanContract { borrower, token_uri, borrowed_amount, interest, days_before_expiration } => mint_loan_contract(deps, env, borrower, token_uri, borrowed_amount, interest, days_before_expiration),
-        ExecuteMsg::ChangeLoanContractStatus { borrower, status_code, paid_amount } => change_loan_contract_status(deps, info, borrower, paid_amount, status_code),
-        ExecuteMsg::AddTokenAddress { address } => add_token_address(deps, address),
+        ExecuteMsg::MintLoanContract { borrower, token_uri, borrowed_amount, interest, days_before_expiration } => execute::mint_loan_contract(deps, env, borrower, token_uri, borrowed_amount, interest, days_before_expiration),
+        ExecuteMsg::ChangeLoanContractStatus { borrower, status_code } => execute::change_loan_contract_status(deps, info, borrower, status_code),
+        ExecuteMsg::AddTokenAddress { address } => execute::add_token_address(deps, address),
+        ExecuteMsg::ChangeMinter { minter } => execute::change_minter(deps, minter),
     }
 }
 
@@ -145,15 +145,16 @@ pub mod execute {
 
     #[cw_serde]
     pub struct BurnMsg{
-        pub burn : Burn,
+        pub burn : BurnFrom,
     }
 
     #[cw_serde]
-    pub struct Burn{
+    pub struct BurnFrom{
+        pub owner : String,
         pub amount : Uint128,
     }
 
-    pub fn change_loan_contract_status(deps: DepsMut, info : MessageInfo, borrower : Addr, paid_amount : Uint64, status_code : Uint64) -> Result<Response, ContractError>{
+    pub fn change_loan_contract_status(deps: DepsMut, info : MessageInfo, borrower : Addr, status_code : Uint64) -> Result<Response, ContractError>{
         let mut loan_info = CONTRACTS.load(deps.storage, borrower.clone())?;
 
         let index = loan_info.iter().position(|x| (*x).address == info.sender);
@@ -170,39 +171,11 @@ pub mod execute {
                 CONTRACTS.save(deps.storage, borrower.clone(), &loan_info)?;
 
                 if status_code == Uint64::new(1) {
-                    let stock_price_request = QueryRequest::Wasm(
-                        WasmQuery::Smart {
-                            contract_addr : "mantra1q44nqkfcude7je0tqhu0u8mm7x8uhgj73n94k2vkx87tsr6yaujsdu3s4a".to_string(),
-                            msg : to_json_binary(&QueryPrice{
-                                get_price : GetPrice { symbol : "USDC".to_string() },
-                            })?,
-                        }
-                    ) ;
-
-                    let stock_price : PriceResponse = deps.querier.query(&stock_price_request)?;
-
-                    let base: u64 = 10;
-
-                    let token_amount = Uint128::new((paid_amount.u64() * base.pow(stock_price.expo as u32) / stock_price.price as u64) as u128 + 1);
-
-                    let token_address = TOKEN.load(deps.storage).map_err(|_| ContractError::TokenAddressNotFound {  })?;
-
-                    let burn_msg : SubMsg = SubMsg::new(
-                        WasmMsg::Execute { 
-                            contract_addr: token_address.to_string(), 
-                            msg: to_json_binary(&BurnMsg{
-                                burn : Burn {
-                                    amount : token_amount,
-                                }
-                            })?, 
-                            funds: vec![] 
-                        });
 
                     Ok(Response::new()
                     .add_attribute("action", "Change loan contract status")
                     .add_attribute("borrower", borrower.clone())
-                    .add_attribute("status_code", status_code)
-                    .add_submessage(burn_msg))
+                    .add_attribute("status_code", status_code))
                 }
                 else if status_code == Uint64::new(2) {
                     Ok(Response::new()
@@ -225,6 +198,14 @@ pub mod execute {
         Ok(Response::new()
             .add_attribute("action", "Added token address")
             .add_attribute("value", validated_addr))
+    }
+
+    pub fn change_minter(deps : DepsMut, minter : u64) -> Result<Response, ContractError>{
+        MINTER.save(deps.storage, &minter)?;
+
+        Ok(Response::new()
+        .add_attribute("action", "Change minter id")
+        .add_attribute("value", minter.to_string()))
     }
 }
 

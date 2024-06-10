@@ -11,6 +11,7 @@ pub struct ContractInfo{
     pub start_date : Timestamp,
     pub expiration_date : Timestamp,
     pub currently_paid : Uint64,
+    pub status_code : Uint64,
 }
 
 pub const CONTRACT_INFO : Item<ContractInfo> = Item::new("contract_info");

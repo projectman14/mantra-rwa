@@ -12,8 +12,9 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub enum ExecuteMsg {
     MintLoanContract{ borrower : Addr, token_uri : String, borrowed_amount : Uint64, interest : Uint64, days_before_expiration : u64},
-    ChangeLoanContractStatus{ borrower : Addr, status_code : Uint64, paid_amount : Uint64 },
+    ChangeLoanContractStatus{ borrower : Addr, status_code : Uint64 },
     AddTokenAddress { address : Addr },
+    ChangeMinter { minter : u64 },
 }
 
 #[cw_serde]

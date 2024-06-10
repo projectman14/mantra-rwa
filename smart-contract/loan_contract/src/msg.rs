@@ -24,4 +24,6 @@ pub enum ExecuteMsg {
 pub enum QueryMsg {
     #[returns(ContractInfo)]
     GetDetails {},
+    #[returns(Uint64)]
+    RemainingPayment {},
 }
