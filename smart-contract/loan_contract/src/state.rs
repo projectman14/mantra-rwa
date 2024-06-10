@@ -14,5 +14,4 @@ pub struct ContractInfo{
 }
 
 pub const CONTRACT_INFO : Item<ContractInfo> = Item::new("contract_info");
-pub const CW20_ADDRESS  : Item<Addr> = Item::new("cw20_address");
 pub const DATABASE_ADDRESS : Item<Addr> = Item::new("database_id");

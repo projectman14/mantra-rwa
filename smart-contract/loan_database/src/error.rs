@@ -1,4 +1,4 @@
-use cosmwasm_std::{StdError, Addr};
+use cosmwasm_std::{StdError, Addr, Uint64};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
@@ -32,4 +32,10 @@ pub enum ContractError {
 
     #[error("No Field {field} in Reply")]
     NoFieldInReply{ field : String },
+
+    #[error("Token address not found")]
+    TokenAddressNotFound{ },
+
+    #[error("Unknown status code {code}")]
+    UnknownStatusCode{ code : Uint64 }
 }

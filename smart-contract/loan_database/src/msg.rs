@@ -12,7 +12,8 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub enum ExecuteMsg {
     MintLoanContract{ borrower : Addr, token_uri : String, borrowed_amount : Uint64, interest : Uint64, days_before_expiration : u64},
-    ChangeLoanContractStatus{ borrower : Addr, status_code : Uint64 },
+    ChangeLoanContractStatus{ borrower : Addr, status_code : Uint64, paid_amount : Uint64 },
+    AddTokenAddress { address : Addr },
 }
 
 #[cw_serde]
@@ -25,4 +26,11 @@ pub enum QueryMsg {
 #[cw_serde]
 pub struct LoanInfos {
     pub contracts : Vec<LoanContract>,
+}
+
+#[cw_serde]
+pub struct PriceResponse {
+    pub price: i64,
+    pub expo: i32,
+    pub timestamp: u64,
 }

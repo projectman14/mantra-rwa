@@ -12,3 +12,4 @@ pub struct LoanContract{
 pub const CONTRACTS : Map<Addr, Vec<LoanContract>> = Map::new("contracts");
 pub const ADMINS : Item<Vec<Addr>> = Item::new("admins");
 pub const MINTER : Item<u64> = Item::new("minter");  //Code ID of uninstantitated loan contract
+pub const TOKEN : Item<Addr> = Item::new("cw20_token_address"); //Address of cw20 token contract

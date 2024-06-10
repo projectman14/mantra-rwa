@@ -11,4 +11,7 @@ pub enum ContractError {
    
     #[error("Overpay")]
     OverPay{},
+
+    #[error("Expiration date crossed")]
+    ExpirationDateCrossed {},
 }

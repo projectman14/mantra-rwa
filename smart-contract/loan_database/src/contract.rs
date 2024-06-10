@@ -1,15 +1,15 @@
 #[cfg(not(feature = "library"))]
 use cosmwasm_std::entry_point;
-use cosmwasm_std::{to_json_binary, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Addr, Uint64, ReplyOn, WasmMsg, SubMsg, Reply};
+use cosmwasm_std::{to_json_binary, WasmQuery, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdResult, Addr, Uint64, ReplyOn, WasmMsg, SubMsg, Reply};
 
 use cw2::set_contract_version;
 use cw_utils::parse_reply_instantiate_data;
-use execute::{change_loan_contract_status, mint_loan_contract};
+use execute::{add_token_address, change_loan_contract_status, mint_loan_contract};
 use cosmwasm_schema::cw_serde;
 
 use crate::error::ContractError;
-use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, LoanInfos};
-use crate::state::{LoanContract, CONTRACTS, MINTER, ADMINS};
+use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, LoanInfos, PriceResponse};
+use crate::state::{LoanContract, CONTRACTS, MINTER, ADMINS, TOKEN};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:loan_database";
@@ -40,11 +40,14 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
     match msg{
         ExecuteMsg::MintLoanContract { borrower, token_uri, borrowed_amount, interest, days_before_expiration } => mint_loan_contract(deps, env, borrower, token_uri, borrowed_amount, interest, days_before_expiration),
-        ExecuteMsg::ChangeLoanContractStatus { borrower, status_code } => change_loan_contract_status(deps, info, borrower, status_code),
+        ExecuteMsg::ChangeLoanContractStatus { borrower, status_code, paid_amount } => change_loan_contract_status(deps, info, borrower, paid_amount, status_code),
+        ExecuteMsg::AddTokenAddress { address } => add_token_address(deps, address),
     }
 }
 
 pub mod execute {
+    use cosmwasm_std::{QueryRequest, Uint128};
+
     use super::*;
 
     #[cw_serde]
@@ -55,6 +58,27 @@ pub mod execute {
         pub borrowed_amount : Uint64,
         pub interest : Uint64,
         pub days_before_expiration : u64,
+    }
+
+    #[cw_serde]
+    pub struct TokenMsg {
+        pub mint : Mint,
+    }
+
+    #[cw_serde]
+    pub struct Mint { 
+        pub recipient: String, 
+        pub amount: Uint128 
+    }
+
+    #[cw_serde]
+    pub struct QueryPrice {
+        pub get_price: GetPrice,
+    }
+
+    #[cw_serde]
+    pub struct GetPrice {
+        pub symbol: String,
     }
 
     pub fn mint_loan_contract(deps: DepsMut, env : Env, borrower : Addr, token_uri : String, borrowed_amount : Uint64, interest : Uint64, days_before_expiration : u64) -> Result<Response, ContractError>{
@@ -72,6 +96,21 @@ pub mod execute {
                     days_before_expiration,
                 };
 
+                let stock_price_request = QueryRequest::Wasm(
+                    WasmQuery::Smart {
+                        contract_addr : "mantra1q44nqkfcude7je0tqhu0u8mm7x8uhgj73n94k2vkx87tsr6yaujsdu3s4a".to_string(),
+                        msg : to_json_binary(&QueryPrice{
+                            get_price : GetPrice { symbol : "USDC".to_string() },
+                        })?,
+                    }
+                ) ;
+
+                let stock_price : PriceResponse = deps.querier.query(&stock_price_request)?;
+
+                let base: u64 = 10;
+
+                let token_amount = Uint128::new((borrowed_amount.u64() * base.pow(stock_price.expo as u32) / stock_price.price as u64) as u128 + 1);
+
                 let mint_msg = SubMsg{ 
                     msg : WasmMsg::Instantiate { 
                     admin: None, 
@@ -83,14 +122,38 @@ pub mod execute {
                 id : 1,
                 gas_limit : None,
                 reply_on : ReplyOn::Success,
-            };
+                };
 
-                Ok(Response::new().add_submessage(mint_msg))
+                let token_address = TOKEN.load(deps.storage).map_err(|_| ContractError::TokenAddressNotFound {  })?;
+
+                let token_msg = SubMsg::new(
+                    WasmMsg::Execute { 
+                        contract_addr: token_address.to_string(), 
+                        msg: to_json_binary(&TokenMsg{
+                            mint : Mint {
+                                recipient : borrower.to_owned().to_string(), 
+                                amount : token_amount,
+                            }
+                        })?, 
+                        funds: vec![] 
+                    });
+
+                Ok(Response::new().add_submessage(mint_msg).add_submessage(token_msg))
             }
         }
     }
 
-    pub fn change_loan_contract_status(deps: DepsMut, info : MessageInfo, borrower : Addr, status_code : Uint64) -> Result<Response, ContractError>{
+    #[cw_serde]
+    pub struct BurnMsg{
+        pub burn : Burn,
+    }
+
+    #[cw_serde]
+    pub struct Burn{
+        pub amount : Uint128,
+    }
+
+    pub fn change_loan_contract_status(deps: DepsMut, info : MessageInfo, borrower : Addr, paid_amount : Uint64, status_code : Uint64) -> Result<Response, ContractError>{
         let mut loan_info = CONTRACTS.load(deps.storage, borrower.clone())?;
 
         let index = loan_info.iter().position(|x| (*x).address == info.sender);
@@ -106,12 +169,62 @@ pub mod execute {
 
                 CONTRACTS.save(deps.storage, borrower.clone(), &loan_info)?;
 
-                Ok(Response::new()
-                .add_attribute("action", "Change loan contract status")
-                .add_attribute("borrower", borrower.clone())
-                .add_attribute("status_code", status_code))
+                if status_code == Uint64::new(1) {
+                    let stock_price_request = QueryRequest::Wasm(
+                        WasmQuery::Smart {
+                            contract_addr : "mantra1q44nqkfcude7je0tqhu0u8mm7x8uhgj73n94k2vkx87tsr6yaujsdu3s4a".to_string(),
+                            msg : to_json_binary(&QueryPrice{
+                                get_price : GetPrice { symbol : "USDC".to_string() },
+                            })?,
+                        }
+                    ) ;
+
+                    let stock_price : PriceResponse = deps.querier.query(&stock_price_request)?;
+
+                    let base: u64 = 10;
+
+                    let token_amount = Uint128::new((paid_amount.u64() * base.pow(stock_price.expo as u32) / stock_price.price as u64) as u128 + 1);
+
+                    let token_address = TOKEN.load(deps.storage).map_err(|_| ContractError::TokenAddressNotFound {  })?;
+
+                    let burn_msg : SubMsg = SubMsg::new(
+                        WasmMsg::Execute { 
+                            contract_addr: token_address.to_string(), 
+                            msg: to_json_binary(&BurnMsg{
+                                burn : Burn {
+                                    amount : token_amount,
+                                }
+                            })?, 
+                            funds: vec![] 
+                        });
+
+                    Ok(Response::new()
+                    .add_attribute("action", "Change loan contract status")
+                    .add_attribute("borrower", borrower.clone())
+                    .add_attribute("status_code", status_code)
+                    .add_submessage(burn_msg))
+                }
+                else if status_code == Uint64::new(2) {
+                    Ok(Response::new()
+                    .add_attribute("action", "Change loan contract status")
+                    .add_attribute("borrower", borrower.clone())
+                    .add_attribute("status_code", status_code))
+                }
+                else{
+                    Err(ContractError::UnknownStatusCode { code: status_code })
+                }
             }
         }
+    }
+
+    pub fn add_token_address(deps: DepsMut, token : Addr) -> Result<Response, ContractError> {
+        let validated_addr = deps.api.addr_validate(token.as_str())?;
+
+        TOKEN.save(deps.storage, &validated_addr)?;
+
+        Ok(Response::new()
+            .add_attribute("action", "Added token address")
+            .add_attribute("value", validated_addr))
     }
 }
 

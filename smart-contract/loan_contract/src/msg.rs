@@ -16,6 +16,7 @@ pub struct InstantiateMsg {
 #[cw_serde]
 pub enum ExecuteMsg {
     AcceptPayment { payment : Uint64},
+    UpdateStatus {},
 }
 
 #[cw_serde]
