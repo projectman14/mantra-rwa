@@ -1,6 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -17,14 +20,111 @@
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  /* background-color: #311B92; */
+  /* background-image: url("https://images.unsplash.com/photo-1715523692156-77aebf1a1d43?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"); */
+  /* background-size: contain; */
+  overflow-x: hidden;
 }
+
+.Hero {
+  background-image: url("../../public/coverpagemain.png");
+  background-size: cover;
+  height: 100vh;
+  width: 100vw;
+}
+
+
+.logo {
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  font-style: italic;
+
+  /*---- for gradiant in logo -----*/
+  background: linear-gradient(to right, #1587E7 100%, #0C2530);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.header-text {
+  font-family: "Plus Jakarta Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.Tagline {
+  width: 100vw;
+}
+
+.Tagline h1 {
+  font-family: "Poppins", sans-serif;
+  font-style: italic;
+}
+
+.Button-back {
+  background-image: linear-gradient(#FF3BFF, #ECBFBF 38%, #5C24FF 76%, #D94FD5 100%);
+}
+
+.Working {
+  background-image: url("../../public/Howitwork.png");
+  background-size: cover;
+  height: 100vh;
+  width: 100vw;
+}
+
+.Working-heading{
+  font-family: "Poppins", sans-serif;
+  font-style: italic;
+}
+
+.RNDT{
+  background: linear-gradient(to right, #1A60E4 100%, #1489C7);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 500;
+  font-family: "Poppins" , sans-serif;
+}
+
+.Lender{
+  font-family: "Poppins" , sans-serif;
+  font-weight: 500;
+  color: white;
+}
+
+.FAQ{
+  background-image: url("../../public/FAQ.png");
+  background-size: cover;
+  height: 100vh;
+  width: 100vw;
+}
+
+.About{
+  background-image: url("../../public/About.png");
+  background-size: cover;
+  height: 100vh;
+  width: 100vw;
+  margin-left: -1rem;
+  margin-top: -2.5rem;
+  z-index: -2;
+}
+
+.Aboutbtm{
+  background-image: url("../../public/Aboutbtm.png");
+  background-size: cover;
+  height: 100vh;
+  width: 100vw;
+  margin-left: -1rem;
+}
+
+.Footer{
+  background-image: url("../../public/END.png");
+  background-size: cover;
+  height: 50vh;
+  width: 100vw;
+  /* margin-top: -15rem; */
+}
+
 
 @layer utilities {
   .text-balance {
