@@ -15,7 +15,7 @@
 
 # production
 /build
-/mantrachaind
+mantrachaind
 
 # misc
 .DS_Store
