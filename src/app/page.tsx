@@ -10,6 +10,8 @@ import Particles from "@/components/magicui/particles";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
+
+
 export default function Home() {
 
   const { theme } = useTheme();
@@ -28,7 +30,7 @@ export default function Home() {
         color={color}
         refresh
       />
-       <Particles
+      <Particles
         className="z-20 -mt-[48rem]"
         quantity={300}
         ease={80}
@@ -56,8 +58,8 @@ export default function Home() {
         color={color}
         refresh
       />
-      <FAQ/>
-      <About/>
+      <FAQ />
+      <About />
       <Particles
         className="z-20 -mt-[48rem]"
         quantity={300}
@@ -65,7 +67,7 @@ export default function Home() {
         color={color}
         refresh
       />
-      <Aboutbtm/>
+      <Aboutbtm />
       <Particles
         className="z-20 -mt-[48rem]"
         quantity={300}
@@ -73,7 +75,7 @@ export default function Home() {
         color={color}
         refresh
       />
-      <Footer/>
+      <Footer />
       <Particles
         className="z-20 -mt-[48rem]"
         quantity={300}
@@ -84,3 +86,5 @@ export default function Home() {
     </div>
   );
 }
+
+

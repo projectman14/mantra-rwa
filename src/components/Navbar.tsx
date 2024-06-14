@@ -1,9 +1,26 @@
+'use client'
+
 import React from 'react';
 import Image from 'next/image';
 import ShineBorder from "@/components/magicui/shine-border";
 
+interface NavbarProps {
+  handleconnect: () => void;
+}
 
-const Navbar: React.FC = () => {
+
+const Navbar: React.FC<NavbarProps> = ({ handleconnect }) => {
+
+
+  // const handleconnect = () => {
+  //   window.keplr?.enable("mantra-hongbai-1");
+
+  //   console.log(window.keplr?.getKey("mantra-hongbai-1").then((keyInfo) => {
+  //     console.log(keyInfo.bech32Address);
+  //   }))
+  // }
+
+
   return (
     <div className='flex mx-20'>
       <div className='my-auto'>
@@ -25,10 +42,10 @@ const Navbar: React.FC = () => {
         </div>
       </div> */}
       <ShineBorder
-        className="text-center text-sm capitalize h-9 w-36 rounded-2xl mr-12 "
+        className="text-center text-sm capitalize h-9 w-36 rounded-2xl mr-12 z-50"
         color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
       >
-        Connect Wallet
+        <p onClick={handleconnect}>Connect Wallet</p>
       </ShineBorder>
     </div>
   );
