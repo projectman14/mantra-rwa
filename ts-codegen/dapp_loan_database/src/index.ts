@@ -23,8 +23,8 @@ async function connect() {
 
     const client = await SigningStargateClient.connectWithSigner(rpcEndpoint, wallet);
 
-    console.log("Connected to node", await client.getChainId())
-    console.log("Account address:", address)
+    // console.log("Connected to node", await client.getChainId())
+    // console.log("Account address:", address)
 
     return {client , address}
 }

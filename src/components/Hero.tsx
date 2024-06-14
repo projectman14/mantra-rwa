@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState , RefObject } from 'react';
 import Navbar from './Navbar';
 import Image from 'next/image';
 import detaling from '../../public/detail.png'
@@ -41,19 +41,59 @@ import { GiveLoan, GetLoanContratAddress } from '../../ts-codegen/dapp_loan_data
 import { ContractInfo } from '../../ts-codegen/dapp_loan_contract/src/codegen/LoanContract.types';
 import { LoanContract } from '../../ts-codegen/dapp_loan_database/src/codegen/LoanDatabase.types';
 import { Key } from 'lucide-react';
+import { data } from '../../ts-codegen/dapp/src';
 
+interface HeroProps {
+  Homeref: RefObject<HTMLDivElement>;
+  Workingref: RefObject<HTMLDivElement>;
+  Aboutref: RefObject<HTMLDivElement>;
+  FAQref: RefObject<HTMLDivElement>;
+}
 
-const Hero: React.FC = () => {
+const Hero: React.FC<HeroProps> = ({Homeref , Workingref , Aboutref , FAQref}) => {
+
+  const [allowparams, setAllowparams] = useState(false);
+  const [sender, setSender] = useState("");
+
+  useEffect(() => {
+    ReturnArray()
+      .then(async (returnedArray) => {
+        try {
+          contractDetailsArray = await GetContractDetailsInObject(returnedArray.map(obj => obj.address));
+          // invoices = await GetContractDetailsInObject(returnedArray.map(obj => obj.address));
+          setContractArrayCopy(returnedArray)
+          setInvoices(contractDetailsArray);
+          console.log(contractDetailsArray);
+          console.log(contractArrayCopy); // Array of contract detail objects
+        } catch (error) {
+          console.error("Error in fetching contract details:", error);
+        }
+      })
+      .catch((error) => {
+        console.error("Error in ReturnArray:", error);
+      });
+  }, [sender])
 
   const handleconnect = () => {
     window.keplr?.enable("mantra-hongbai-1");
 
     const valueaddr = window.keplr?.getKey("mantra-hongbai-1").then((keyInfo) => {
       console.log("HI HI", keyInfo.bech32Address);
+      setAllowparams(true);
+      setSender(keyInfo.bech32Address);
       return keyInfo.bech32Address;
     })
 
   }
+
+  useEffect(() => {
+    window.keplr?.getKey("mantra-hongbai-1").then((keyInfo) => {
+      console.log("HI HI", keyInfo.bech32Address);
+      setAllowparams(true);
+      setSender(keyInfo.bech32Address);
+      return keyInfo.bech32Address;
+    })
+  }, [])
 
 
   const mnemonic = "fuel grunt humor output offer box bridge hover motor code spoon token have order grief medal sport bulk corn pave market insane access urge"; // Replace with your actual mnemonic
@@ -69,16 +109,17 @@ const Hero: React.FC = () => {
     alert(borrowedAmountval + tokenUrival + Daysbeforeval);
 
     const accessloan = await GiveLoan();
-    const value1 = accessloan.mintLoanContract({ borrowedAmount: borrowedAmountval, borrower: "mantra16xxvu843zv9k7p352tmpe008txfkzd2qh6vt8h", daysBeforeExpiration: Number(Daysbeforeval), interest: "5", tokenUri: tokenUrival });
+    const value1 = accessloan.mintLoanContract({ borrowedAmount: borrowedAmountval, borrower: sender, daysBeforeExpiration: Number(Daysbeforeval), interest: "5", tokenUri: tokenUrival });
     // const value1 = accessloan.mintLoanContract({ borrowedAmount: "78", borrower: "mantra1eqpxy66m8hr4v8njncg68p5melwlgq93kqt5nm", daysBeforeExpiration: 50, interest: "5", tokenUri: "tokenUri" })
     console.log(value1);
     console.log("sucess");
+    handleClick();
   }
 
   async function ReturnArray() {
     try {
       const accessaddress = await GetLoanContratAddress();
-      const addressArray = await accessaddress.getLoans({ borrower: "mantra16xxvu843zv9k7p352tmpe008txfkzd2qh6vt8h" });
+      const addressArray = await accessaddress.getLoans({ borrower: sender });
 
       if (!addressArray || addressArray.length === 0) {
         throw new Error("No contract addresses found or invalid response.");
@@ -108,7 +149,7 @@ const Hero: React.FC = () => {
   let contractDetailsArray: ContractInfo[] = [];
   const [contractArrayCopy, setContractArrayCopy] = useState<LoanContract[]>([]);
   const [invoices, setInvoices] = useState<ContractInfo[]>([])
-  const [sender, setSender] = useState("");
+
   // Usage example
   ReturnArray()
     .then(async (returnedArray) => {
@@ -221,7 +262,7 @@ const Hero: React.FC = () => {
     <div className='Hero mr-16'>
       <div className='coverpage h-96'>
         <div className='p-4'>
-          <Navbar handleconnect={handleconnect} />
+          <Navbar handleconnect={handleconnect} status={allowparams} Homeref={Homeref} Workingref={Workingref} Aboutref={Aboutref} FAQref={FAQref} />
         </div>
         <div className='Tagline mt-24'>
           <h1 className='text-5xl font-bold text-white ml-[23rem]'>Welcome to TokenLand - Your Trusted</h1>
@@ -246,9 +287,9 @@ const Hero: React.FC = () => {
         </div>
         {/*---- Button Special ------ */}
         <div className='flex mt-20 ml-[36rem]'>
-          <div className='z-50 '>
+          <div className='z-50 ' id=''>
             <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
+              <DialogTrigger asChild onClick={allowparams ? handleconnect : undefined}>
                 <div ><ShineBorder
                   className="text-center text-sm capitalize h-8 w-36 rounded-2xl mr-12 hover:cursor-pointer"
                   color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
@@ -310,7 +351,7 @@ const Hero: React.FC = () => {
                   </div>
                 </div>
                 <DialogFooter>
-                  <Button type="submit" onClick={handleclick1}>Save changes</Button>
+                  <Button type="submit" onClick={handleclick1}>Apply for loan</Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>
@@ -334,9 +375,9 @@ const Hero: React.FC = () => {
               </DialogHeader>
               <div>
                 <Table>
-                  {/* <TableCaption>A list of your recent invoices.</TableCaption> */}
-                  <TableHeader>
-                    <TableRow>
+                  <TableCaption>{allowparams ? "" : "Connect wallet to Load Data!!"}</TableCaption>
+                  <TableHeader >
+                    <TableRow className='!border-[#497de3]'>
                       <TableHead className="w-[100px]">Loan Amount</TableHead>
                       <TableHead>Status</TableHead>
                       <TableHead>Starting Date</TableHead>
@@ -347,11 +388,54 @@ const Hero: React.FC = () => {
                   </TableHeader>
                   <TableBody>
                     {invoices.map((invoice, index) => (
-                      <TableRow key={invoice.invoice}>
+                      <TableRow key={invoice.invoice} className='!border-[#497de3]'>
                         <TableCell className="font-medium">{invoice.borrowed_amount}</TableCell>
                         <TableCell>{invoice.status_code}</TableCell>
-                        <TableCell>{invoice.start_date}</TableCell>
-                        <TableCell className="text-center">{invoice.expiration_date}</TableCell>
+                        <TableCell>{(() => {
+                          // Assume invoice.start_date is in nanoseconds
+                          const datedata = Number(invoice.start_date) / 1e6;
+
+                          // Check if datedata is a valid number
+                          if (isNaN(datedata)) {
+                            return 'Invalid Date';
+                          }
+
+                          const data = new Date(datedata);
+
+                          // Check if the date object is valid
+                          if (isNaN(data.getTime())) {
+                            return 'Invalid Date';
+                          }
+
+                          const day = String(data.getDate()).padStart(2, '0');
+                          const month = String(data.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+                          const year = data.getFullYear();
+
+                          return `${day}/${month}/${year}`;
+                        })()}
+                        </TableCell>
+                        <TableCell className="text-center">{(() => {
+                          // Assume invoice.start_date is in nanoseconds
+                          const datedata = Number(invoice.expiration_date) / 1e6;
+
+                          // Check if datedata is a valid number
+                          if (isNaN(datedata)) {
+                            return 'Invalid Date';
+                          }
+
+                          const data = new Date(datedata);
+
+                          // Check if the date object is valid
+                          if (isNaN(data.getTime())) {
+                            return 'Invalid Date';
+                          }
+
+                          const day = String(data.getDate()).padStart(2, '0');
+                          const month = String(data.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
+                          const year = data.getFullYear();
+
+                          return `${day}/${month}/${year}`;
+                        })()}</TableCell>
                         <TableCell className="text-center text-white">{Number(invoice.borrowed_amount) - Number(invoice.currently_paid)}</TableCell>
                         <TableCell>
                           <Dialog>

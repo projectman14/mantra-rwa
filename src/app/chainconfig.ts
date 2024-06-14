@@ -31,7 +31,7 @@ export const mantra: Chain = {
     staking: {
         staking_tokens: [
             {
-                denom: "UOM",
+                denom: "uom",
             },
         ],
     },
@@ -49,26 +49,26 @@ export const mantra: Chain = {
     },
 };
 
-export const manAssetList: AssetList = {
-    chain_name: "mantrachaintestnet",
-    assets: [
-        {
-            base: "uOM",
-            display: "UOM",
-            name: "mantra",
-            description: "Hongbai testnet",
-            denom_units: [
-                {
-                    denom: "uom",
-                    exponent: 6,
-                },
-            ],
-            symbol: "OM",
-            logo_URIs: {
-                png: "gc.png",
-            },
-        },
-    ],
-};
+// export const manAssetList: AssetList = {
+//     chain_name: "mantrachaintestnet",
+//     assets: [
+//         {
+//             base: "uOM",
+//             display: "UOM",
+//             name: "mantra",
+//             description: "Hongbai testnet",
+//             denom_units: [
+//                 {
+//                     denom: "uom",
+//                     exponent: 6,
+//                 },
+//             ],
+//             symbol: "OM",
+//             logo_URIs: {
+//                 png: "gc.png",
+//             },
+//         },
+//     ],
+// };
 
 
