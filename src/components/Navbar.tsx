@@ -1,15 +1,21 @@
 'use client'
 
 import React from 'react';
+import { RefObject } from 'react';
 import Image from 'next/image';
 import ShineBorder from "@/components/magicui/shine-border";
 
 interface NavbarProps {
   handleconnect: () => void;
+  status : boolean;
+  Homeref: RefObject<HTMLDivElement>;
+  Workingref: RefObject<HTMLDivElement>;
+  Aboutref: RefObject<HTMLDivElement>;
+  FAQref: RefObject<HTMLDivElement>
 }
 
 
-const Navbar: React.FC<NavbarProps> = ({ handleconnect }) => {
+const Navbar: React.FC<NavbarProps> = ({ handleconnect , status , Homeref , Workingref , Aboutref , FAQref }) => {
 
 
   // const handleconnect = () => {
@@ -26,12 +32,12 @@ const Navbar: React.FC<NavbarProps> = ({ handleconnect }) => {
       <div className='my-auto'>
         <h3 className='logo text-xl'>TokenLAnd</h3>
       </div>
-      <div className='flex flex-row justify-evenly mx-auto'>
-        <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'>Home</p>
-        <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'>Borrow Token</p>
-        <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'>About Us</p>
-        <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'>Working</p>
-        <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'>FAQ</p>
+      <div className='flex flex-row justify-evenly mx-auto z-50'>
+        <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'  onClick={()=>{Homeref.current?.scrollIntoView({behavior:'smooth'})}}>Home</p>
+        <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'  >Borrow Token</p>
+        <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'  onClick={()=>{Aboutref.current?.scrollIntoView({behavior:'smooth'})}}>About Us</p>
+        <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'  onClick={()=>{Workingref.current?.scrollIntoView({behavior:'smooth'})}}>Working</p>
+        <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'  onClick={()=>{FAQref.current?.scrollIntoView({behavior:'smooth'})}}>FAQ</p>
       </div>
       {/* <div className='Button-back rounded-2xl'>
         <button className='bg-black border-white p-1 m-1 text-white rounded-2xl'>Connect</button>
@@ -45,7 +51,7 @@ const Navbar: React.FC<NavbarProps> = ({ handleconnect }) => {
         className="text-center text-sm capitalize h-9 w-36 rounded-2xl mr-12 z-50"
         color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
       >
-        <p onClick={handleconnect}>Connect Wallet</p>
+        <p onClick={handleconnect}>{status ? "Connected" :"Connect Wallet"}</p>
       </ShineBorder>
     </div>
   );

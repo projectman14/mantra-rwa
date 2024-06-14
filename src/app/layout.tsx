@@ -13,7 +13,7 @@ import Head from "next/head";
 import { assets as tmp, chains as tmp2 } from "chain-registry";
 import { type AssetList, type Chain } from "@chain-registry/types";
 
-import { mantra, manAssetList } from "./chainconfig";
+import { mantra } from "./chainconfig";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,7 +36,7 @@ export default function RootLayout({
   return (
     // <ChainProvider
     //   chains={[...chains, mantra]}
-    //   assetLists={[...assets, manAssetList]}
+    //   assetLists={[...assets]}
     //   wallets={wallets}
     // >
     <>
@@ -55,7 +55,7 @@ export default function RootLayout({
         </body>
       </html>
     </>
-    // </ChainProvider>
+    //  </ChainProvider>
 
   );
 }
