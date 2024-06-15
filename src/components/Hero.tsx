@@ -1,11 +1,11 @@
 'use client'
 
-import React, { useEffect, useState , RefObject } from 'react';
+import React, { useEffect, useState, RefObject } from 'react';
 import Navbar from './Navbar';
 import Image from 'next/image';
 import detaling from '../../public/detail.png'
 import ShineBorder from "@/components/magicui/shine-border";
-
+import { useRouter, NextRouter } from 'next/router';
 import { ToastAction } from "@/components/ui/toast"
 import { useToast } from "@/components/ui/use-toast"
 
@@ -41,6 +41,7 @@ import { GiveLoan, GetLoanContratAddress } from '../../ts-codegen/dapp_loan_data
 import { ContractInfo } from '../../ts-codegen/dapp_loan_contract/src/codegen/LoanContract.types';
 import { LoanContract } from '../../ts-codegen/dapp_loan_database/src/codegen/LoanDatabase.types';
 import { Key } from 'lucide-react';
+import Link from 'next/link';
 import { data } from '../../ts-codegen/dapp/src';
 
 interface HeroProps {
@@ -50,10 +51,11 @@ interface HeroProps {
   FAQref: RefObject<HTMLDivElement>;
 }
 
-const Hero: React.FC<HeroProps> = ({Homeref , Workingref , Aboutref , FAQref}) => {
+const Hero: React.FC<HeroProps> = ({ Homeref, Workingref, Aboutref, FAQref }) => {
 
   const [allowparams, setAllowparams] = useState(false);
   const [sender, setSender] = useState("");
+
 
   useEffect(() => {
     ReturnArray()
@@ -287,199 +289,21 @@ const Hero: React.FC<HeroProps> = ({Homeref , Workingref , Aboutref , FAQref}) =
         </div>
         {/*---- Button Special ------ */}
         <div className='flex mt-20 ml-[36rem]'>
-          <div className='z-50 ' id=''>
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild onClick={allowparams ? handleconnect : undefined}>
-                <div ><ShineBorder
-                  className="text-center text-sm capitalize h-8 w-36 rounded-2xl mr-12 hover:cursor-pointer"
-                  color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
-                >
-                  Borrow Token
-                </ShineBorder></div>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px] text-white bg-black ">
-                <DialogHeader>
-                  <DialogTitle className='text-white'>Loan Information</DialogTitle>
-                  <DialogDescription className='text-white font-extralight'>
-                    Complete the below inputs to apply for the loan.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4 py-4 text-white">
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="Collateral" className="text-right">
-                      Collateral
-                    </Label>
-                    <Input
-                      id="Collateral"
-                      defaultValue=""
-                      placeholder='Describe you Collateral'
-                      className="col-span-3"
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="number" className="text-right">
-                      Mobile Number
-                    </Label>
-                    <Input
-                      id="number"
-                      defaultValue=""
-                      className="col-span-3"
-                      placeholder='+91756824XXXX'
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="Amount" className="text-right">
-                      Amount
-                    </Label>
-                    <Input
-                      id="Amount"
-                      defaultValue=""
-                      className="col-span-3"
-                      placeholder='Amount you want to borrow'
-                    />
-                  </div>
-                  <div className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor="For_how_many_days" className="text-right">
-                      Days
-                    </Label>
-                    <Input
-                      id="For_how_many_days"
-                      defaultValue=""
-                      className="col-span-3"
-                      placeholder='For how many days?'
-                    />
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button type="submit" onClick={handleclick1}>Apply for loan</Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
-          {/*  */}
-
-          <Dialog>
-            <DialogTrigger asChild>
-              <div className='bg-white z-50 p-[0.125rem] rounded-2xl w-36 h-8 mr-12 hover:cursor-pointer'>
-                <div className='bg-black rounded-xl text-white h-7 hover:cursor-pointer'>
-                  <p className='text-sm ml-4 pt-1 hover:cursor-pointer' onClick={showRemaining}>List Loan Status</p>
-                </div>
-              </div>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[50rem] bg-black text-white">
-              <DialogHeader>
-                <DialogTitle>Loan Status</DialogTitle>
-                <DialogDescription>
-                  All the loans that are taken by you are shown here.
-                </DialogDescription>
-              </DialogHeader>
-              <div>
-                <Table>
-                  <TableCaption>{allowparams ? "" : "Connect wallet to Load Data!!"}</TableCaption>
-                  <TableHeader >
-                    <TableRow className='!border-[#497de3]'>
-                      <TableHead className="w-[100px]">Loan Amount</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Starting Date</TableHead>
-                      <TableHead className='text-center'>Ending Date </TableHead>
-                      <TableHead className='text-center'>Remaning Payment</TableHead>
-                      <TableHead className="">Pay Now</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {invoices.map((invoice, index) => (
-                      <TableRow key={invoice.invoice} className='!border-[#497de3]'>
-                        <TableCell className="font-medium">{invoice.borrowed_amount}</TableCell>
-                        <TableCell>{invoice.status_code}</TableCell>
-                        <TableCell>{(() => {
-                          // Assume invoice.start_date is in nanoseconds
-                          const datedata = Number(invoice.start_date) / 1e6;
-
-                          // Check if datedata is a valid number
-                          if (isNaN(datedata)) {
-                            return 'Invalid Date';
-                          }
-
-                          const data = new Date(datedata);
-
-                          // Check if the date object is valid
-                          if (isNaN(data.getTime())) {
-                            return 'Invalid Date';
-                          }
-
-                          const day = String(data.getDate()).padStart(2, '0');
-                          const month = String(data.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-                          const year = data.getFullYear();
-
-                          return `${day}/${month}/${year}`;
-                        })()}
-                        </TableCell>
-                        <TableCell className="text-center">{(() => {
-                          // Assume invoice.start_date is in nanoseconds
-                          const datedata = Number(invoice.expiration_date) / 1e6;
-
-                          // Check if datedata is a valid number
-                          if (isNaN(datedata)) {
-                            return 'Invalid Date';
-                          }
-
-                          const data = new Date(datedata);
-
-                          // Check if the date object is valid
-                          if (isNaN(data.getTime())) {
-                            return 'Invalid Date';
-                          }
-
-                          const day = String(data.getDate()).padStart(2, '0');
-                          const month = String(data.getMonth() + 1).padStart(2, '0'); // Months are zero-indexed
-                          const year = data.getFullYear();
-
-                          return `${day}/${month}/${year}`;
-                        })()}</TableCell>
-                        <TableCell className="text-center text-white">{Number(invoice.borrowed_amount) - Number(invoice.currently_paid)}</TableCell>
-                        <TableCell>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <button className='bg-white text-black p-1 rounded-lg w-16'>Pay</button>
-                            </DialogTrigger>
-                            <DialogContent className="sm:max-w-[425px] bg-black text-white">
-                              <DialogHeader>
-                                <DialogTitle>Repay Amount Dialog</DialogTitle>
-                                {/* <DialogDescription>
-                                  Make changes to your profile here. Click save when you're done.
-                                </DialogDescription> */}
-                              </DialogHeader>
-                              <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                  <Label htmlFor="name" className="text-right">
-                                    Repay Amount
-                                  </Label>
-                                  <Input
-                                    id="repay_amount"
-                                    defaultValue=""
-                                    className="col-span-3"
-                                    placeholder='Enter the amount to repay!'
-                                  />
-                                </div>
-                              </div>
-                              <DialogFooter>
-                                <Button type="submit" onClick={() => { repayAmount((contractArrayCopy[index]).address) }}>Pay Now</Button>
-                              </DialogFooter>
-                            </DialogContent>
-                          </Dialog>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
-            </DialogContent>
-          </Dialog>
-
-        </div>
-
+          <ShineBorder
+            className="text-center text-sm capitalize h-8 w-36 rounded-2xl mr-12 hover:cursor-pointer mt-6"
+            color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
+          >
+            <Link href='./borrowtoken'>Borrow Token</Link>
+          </ShineBorder></div>
       </div>
-    </div >
+
+      <div className='bg-white z-50 p-[0.125rem] rounded-2xl w-36 h-8 mr-12 hover:cursor-pointer ml-[48rem] mt-[13.25rem] relative'>
+        <div className='bg-black rounded-xl text-white h-7 hover:cursor-pointer'>
+          <p className='text-sm ml-4 pt-1 hover:cursor-pointer z-50 ' ><Link href='/tablesection' className='text-white'>List Loan Status</Link></p>
+        </div>
+      </div>
+
+    </div>
   );
 }
 

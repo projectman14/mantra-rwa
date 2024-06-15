@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
+.heading-section-status {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    font-variation-settings: "slnt" 0;
+}
+
+.tablesection {
+    /* height: 100vh; */
+    height: full;
+    width: 100vw;
+}
+
+.tablesection-div{
+    background: linear-gradient(to bottom, #E1EAF6 65%, #F6FAFF 100%);
+}
+
+.days-btn{
+    background-color: #0066ff 50%;
+}

@@ -12,7 +12,10 @@ import { useEffect, useState , useRef} from "react";
 
 
 
+
+
 export default function Home() {
+
 
   const Homeref = useRef<HTMLDivElement | null>(null);
   const FAQref = useRef<HTMLDivElement | null>(null);
@@ -27,7 +30,7 @@ export default function Home() {
   return (
     <div>
       <div ref={Homeref}>
-        <Hero Homeref={Homeref} Workingref={Workingref} Aboutref={Aboutref} FAQref={FAQref}/>
+        <Hero Homeref={Homeref} Workingref={Workingref} Aboutref={Aboutref} FAQref={FAQref} />
       </div>
       <div ref={Workingref}>
         <Working />
