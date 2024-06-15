@@ -9,7 +9,13 @@ pub struct LoanContract{
     pub status_code : Uint64,
 }
 
+#[cw_serde]
+pub struct TokenInfo {
+    pub address : Addr,
+    pub denom : u64,
+}
+
 pub const CONTRACTS : Map<Addr, Vec<LoanContract>> = Map::new("contracts");
 pub const ADMINS : Item<Vec<Addr>> = Item::new("admins");
 pub const MINTER : Item<u64> = Item::new("minter");  //Code ID of uninstantitated loan contract
-pub const TOKEN : Item<Addr> = Item::new("cw20_token_address"); //Address of cw20 token contract
+pub const TOKEN : Item<TokenInfo> = Item::new("cw20_token_address"); //Information of cw20 token contract

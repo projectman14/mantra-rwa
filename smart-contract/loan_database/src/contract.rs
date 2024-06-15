@@ -8,7 +8,7 @@ use cosmwasm_schema::cw_serde;
 
 use crate::error::ContractError;
 use crate::msg::{ExecuteMsg, InstantiateMsg, QueryMsg, LoanInfos, PriceResponse};
-use crate::state::{LoanContract, CONTRACTS, MINTER, ADMINS, TOKEN};
+use crate::state::{LoanContract, TokenInfo, CONTRACTS, MINTER, ADMINS, TOKEN};
 
 // version info for migration info
 const CONTRACT_NAME: &str = "crates.io:loan_database";
@@ -40,7 +40,7 @@ pub fn execute(
     match msg{
         ExecuteMsg::MintLoanContract { borrower, token_uri, borrowed_amount, interest, days_before_expiration } => execute::mint_loan_contract(deps, env, borrower, token_uri, borrowed_amount, interest, days_before_expiration),
         ExecuteMsg::ChangeLoanContractStatus { borrower, status_code } => execute::change_loan_contract_status(deps, info, borrower, status_code),
-        ExecuteMsg::AddTokenAddress { address } => execute::add_token_address(deps, address),
+        ExecuteMsg::AddToken { address , denom } => execute::add_token(deps, address, denom),
         ExecuteMsg::ChangeMinter { minter } => execute::change_minter(deps, minter),
     }
 }
@@ -87,11 +87,13 @@ pub mod execute {
         match minter_code_id{
             None => Err(ContractError::MinterValueNotFound {  }),
             Some(minter_code_id) =>{
+                let payback_amount : Uint64 = Uint64::new((borrowed_amount.u64() * 2)/100);
+
                 let instantiate_msg = LoanInstantiate{
                     database_address : env.contract.address,
                     borrower : borrower.clone(),
                     token_uri : token_uri.clone(),
-                    borrowed_amount,
+                    borrowed_amount : payback_amount,
                     interest,
                     days_before_expiration,
                 };
@@ -108,8 +110,11 @@ pub mod execute {
                 let stock_price : PriceResponse = deps.querier.query(&stock_price_request)?;
 
                 let base: u64 = 10;
+                let token_info = TOKEN.load(deps.storage).map_err(|_| ContractError::TokenAddressNotFound {  })?;
+                let expo : u32 = stock_price.expo.try_into().unwrap();
+                let price : u64 = stock_price.price.try_into().unwrap();
 
-                let token_amount = Uint128::new((borrowed_amount.u64() * base.pow(stock_price.expo as u32) / stock_price.price as u64) as u128 + 1);
+                let token_amount = Uint128::new((borrowed_amount.u64() * base.pow(expo) * token_info.denom) as u128)/Uint128::new(price as u128);
 
                 let mint_msg = SubMsg{ 
                     msg : WasmMsg::Instantiate { 
@@ -124,11 +129,9 @@ pub mod execute {
                 reply_on : ReplyOn::Success,
                 };
 
-                let token_address = TOKEN.load(deps.storage).map_err(|_| ContractError::TokenAddressNotFound {  })?;
-
                 let token_msg = SubMsg::new(
                     WasmMsg::Execute { 
-                        contract_addr: token_address.to_string(), 
+                        contract_addr: token_info.address.to_string(), 
                         msg: to_json_binary(&TokenMsg{
                             mint : Mint {
                                 recipient : borrower.to_owned().to_string(), 
@@ -190,14 +193,20 @@ pub mod execute {
         }
     }
 
-    pub fn add_token_address(deps: DepsMut, token : Addr) -> Result<Response, ContractError> {
+    pub fn add_token(deps: DepsMut, token : Addr, denom : u64) -> Result<Response, ContractError> {
         let validated_addr = deps.api.addr_validate(token.as_str())?;
 
-        TOKEN.save(deps.storage, &validated_addr)?;
+        let token_info = TokenInfo{
+            address : validated_addr.to_owned(),
+            denom,
+        };
+
+        TOKEN.save(deps.storage, &token_info)?;
 
         Ok(Response::new()
             .add_attribute("action", "Added token address")
-            .add_attribute("value", validated_addr))
+            .add_attribute("value", validated_addr)
+            .add_attribute("denom", denom.to_string()))
     }
 
     pub fn change_minter(deps : DepsMut, minter : u64) -> Result<Response, ContractError>{

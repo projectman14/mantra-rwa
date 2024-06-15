@@ -36,7 +36,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
-import { GetLoanDetails, GetRemanigPayment, AcceptLoanPayment } from '/home/lakshya/auction-platform/ts-codegen/dapp_loan_contract/src/index';
+import { GetLoanDetails, GetRemanigPayment, AcceptLoanPayment } from '../../ts-codegen/dapp_loan_contract/src/index';
 import { GiveLoan, GetLoanContratAddress } from '../../ts-codegen/dapp_loan_database/src/index';
 import { ContractInfo } from '../../ts-codegen/dapp_loan_contract/src/codegen/LoanContract.types';
 import { LoanContract } from '../../ts-codegen/dapp_loan_database/src/codegen/LoanDatabase.types';
