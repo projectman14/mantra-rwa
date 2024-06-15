@@ -114,7 +114,7 @@ pub mod execute {
                 let expo : u32 = stock_price.expo.try_into().unwrap();
                 let price : u64 = stock_price.price.try_into().unwrap();
 
-                let token_amount = Uint128::new((borrowed_amount.u64() * base.pow(expo) * token_info.denom) as u128)/Uint128::new(price as u128);
+                let token_amount = Uint128::new((borrowed_amount.u64() * base.pow(expo) * base.pow(token_info.denom)) as u128)/Uint128::new(price as u128);
 
                 let mint_msg = SubMsg{ 
                     msg : WasmMsg::Instantiate { 
@@ -193,7 +193,7 @@ pub mod execute {
         }
     }
 
-    pub fn add_token(deps: DepsMut, token : Addr, denom : u64) -> Result<Response, ContractError> {
+    pub fn add_token(deps: DepsMut, token : Addr, denom : u32) -> Result<Response, ContractError> {
         let validated_addr = deps.api.addr_validate(token.as_str())?;
 
         let token_info = TokenInfo{

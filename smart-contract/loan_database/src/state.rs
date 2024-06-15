@@ -12,7 +12,7 @@ pub struct LoanContract{
 #[cw_serde]
 pub struct TokenInfo {
     pub address : Addr,
-    pub denom : u64,
+    pub denom : u32,
 }
 
 pub const CONTRACTS : Map<Addr, Vec<LoanContract>> = Map::new("contracts");
