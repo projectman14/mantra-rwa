@@ -267,8 +267,8 @@ const Hero: React.FC<HeroProps> = ({ Homeref, Workingref, Aboutref, FAQref }) =>
           <Navbar handleconnect={handleconnect} status={allowparams} Homeref={Homeref} Workingref={Workingref} Aboutref={Aboutref} FAQref={FAQref} />
         </div>
         <div className='Tagline mt-24'>
-          <h1 className='text-5xl font-bold text-white ml-[23rem]'>Welcome to TokenLand - Your Trusted</h1>
-          <h1 className='text-5xl font-bold text-white ml-[32rem] mt-3'>Web3 Lending Platform</h1>
+          <h1 className='text-5xl font-bold text-white ml-[23rem] !heading-hero'>Welcome to TokenLand - Your Trusted</h1>
+          <h1 className='text-5xl font-bold text-white ml-[32rem] mt-3 !heading-hero'>Web3 Lending Platform</h1>
         </div>
         <div>
           <Image src={detaling} alt={''} className='mt-28 h-32 w-[55rem] mx-auto' />
@@ -283,23 +283,23 @@ const Hero: React.FC<HeroProps> = ({ Homeref, Workingref, Aboutref, FAQref }) =>
             </div>
             <div className='m-5 mr-32'>
               <h3 className='text-white text-base '>Total Active User</h3>
-              <h3 className='text-white font-bold text-lg ml-[1rem]'>$605.04M</h3>
+              <h3 className='text-white font-bold text-lg ml-[2.25rem]'>60.4M</h3>
             </div>
           </div>
         </div>
         {/*---- Button Special ------ */}
         <div className='flex mt-20 ml-[36rem]'>
           <ShineBorder
-            className="text-center text-sm capitalize h-8 w-36 rounded-2xl mr-12 hover:cursor-pointer mt-6"
+            className="text-center align-middle text-base attractuser capitalize h-12 w-40 rounded-2xl mr-12 hover:cursor-pointer mt-6 pt-4"
             color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
           >
-            <Link href='./borrowtoken'>Borrow Token</Link>
+            <Link href='./borrowtoken' className='mt-[1rem]'>Borrow Token</Link>
           </ShineBorder></div>
       </div>
 
-      <div className='bg-white z-50 p-[0.125rem] rounded-2xl w-36 h-8 mr-12 hover:cursor-pointer ml-[48rem] mt-[13.25rem] relative'>
-        <div className='bg-black rounded-xl text-white h-7 hover:cursor-pointer'>
-          <p className='text-sm ml-4 pt-1 hover:cursor-pointer z-50 ' ><Link href='/tablesection' className='text-white'>List Loan Status</Link></p>
+      <div className='bg-white z-50 p-[0.125rem] attractuser rounded-2xl w-40 h-12 mr-12 hover:cursor-pointer ml-[48rem] mt-[13.25rem] relative'>
+        <div className='bg-black rounded-xl text-white h-11 hover:cursor-pointer'>
+          <p className='text-base ml-4 pt-[0.6rem] hover:cursor-pointer z-50 ' ><Link href='/tablesection' className='text-white'>List Loan Status</Link></p>
         </div>
       </div>
 

@@ -14,10 +14,18 @@
     width: 100vw;
 }
 
-.tablesection-div{
+.tablesection-div {
     background: linear-gradient(to bottom, #E1EAF6 65%, #F6FAFF 100%);
 }
 
-.days-btn{
+.days-btn {
     background-color: #0066ff 50%;
+}
+
+.msg-admin {
+    font-family: "Inter", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-style: normal;
+    font-variation-settings: "slnt" 0;
 }

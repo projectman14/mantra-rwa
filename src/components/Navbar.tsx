@@ -4,6 +4,7 @@ import React from 'react';
 import { RefObject } from 'react';
 import Image from 'next/image';
 import ShineBorder from "@/components/magicui/shine-border";
+import tokenlogo from "../../public/Tokenlandlogo.svg"
 
 interface NavbarProps {
   handleconnect: () => void;
@@ -29,8 +30,9 @@ const Navbar: React.FC<NavbarProps> = ({ handleconnect , status , Homeref , Work
 
   return (
     <div className='flex mx-20'>
-      <div className='my-auto'>
-        <h3 className='logo text-xl'>TokenLAnd</h3>
+      <div className='my-auto flex'>
+        <Image src={tokenlogo} alt='' className='-mt-2'/>
+        <h3 className='logo text-xl -ml-1'>TokenLAnd</h3>
       </div>
       <div className='flex flex-row justify-evenly mx-auto z-50'>
         <p className='text-white mx-5 header-text text-sm my-auto hover:cursor-pointer'  onClick={()=>{Homeref.current?.scrollIntoView({behavior:'smooth'})}}>Home</p>

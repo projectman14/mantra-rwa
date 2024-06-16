@@ -35,8 +35,8 @@ const FAQ: React.FC = () => {
             <div className='text-white mx-[25rem] rounded-xl relative p-4'>
 
                 <BorderBeam size={300} duration={12} delay={4} />
-                <div className=''>
-                    <Accordion type="single" collapsible className="w-full">
+                <div className='relative z-50'>
+                    <Accordion type="single" collapsible className="w-full z-50">
                         <AccordionItem value="item-1">
                             <AccordionTrigger>How do I lend tokens on TokenLend?</AccordionTrigger>
                             <AccordionContent>

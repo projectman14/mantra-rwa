@@ -25,6 +25,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import confetti from "canvas-confetti";
+import Link from "next/link";
 
 
 interface DataObject {
@@ -56,46 +57,46 @@ const Borrowtoken = () => {
 
     const toastapperclick = () => {
         toast({
-          title: "Loan Applied Successfully ",
-          description: "We will connect to you and it will be approved",
-          action: (
-            <ToastAction altText="Goto schedule to undo" className='bg-black text-white hover:bg-black'>Okay</ToastAction>
-          ),
+            title: "Loan Applied Successfully ",
+            description: "We will connect to you and it will be approved",
+            action: (
+                <ToastAction altText="Goto schedule to undo" className='bg-black text-white hover:bg-black'>Okay</ToastAction>
+            ),
         })
-      }
+    }
 
     const handleClick = () => {
         const end = Date.now() + 3 * 1000; // 3 seconds
         const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"];
-    
+
         const frame = () => {
-          if (Date.now() > end) return;
-    
-          confetti({
-            particleCount: 2,
-            angle: 60,
-            spread: 55,
-            startVelocity: 60,
-            origin: { x: 0, y: 0.5 },
-            colors: colors,
-          });
-          confetti({
-            particleCount: 2,
-            angle: 120,
-            spread: 55,
-            startVelocity: 60,
-            origin: { x: 1, y: 0.5 },
-            colors: colors,
-          });
-    
-          requestAnimationFrame(frame);
+            if (Date.now() > end) return;
+
+            confetti({
+                particleCount: 2,
+                angle: 60,
+                spread: 55,
+                startVelocity: 60,
+                origin: { x: 0, y: 0.5 },
+                colors: colors,
+            });
+            confetti({
+                particleCount: 2,
+                angle: 120,
+                spread: 55,
+                startVelocity: 60,
+                origin: { x: 1, y: 0.5 },
+                colors: colors,
+            });
+
+            requestAnimationFrame(frame);
         };
-    
+
         frame();
         toastapperclick();
-      };
+    };
 
-      const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         const sender = admin;
         const Collatral = document.getElementById("collatral") as HTMLInputElement;
@@ -116,14 +117,19 @@ const Borrowtoken = () => {
         };
         await saveData(newData);
         handleClick();
-      };
+
+        Collatral.value = "";
+        amount.value = "";
+        numb.value = "";
+        days.value = "";
+    };
 
 
     return (
         <div className="bg-[#F6FAFF] tablesection pb-[5rem] flex-col borrowtoken overflow-y-hidden">
-            <div className="flex m-2 justify-evenly my-2 ml-[7rem] z-50">
+            <div className="flex m-2 justify-evenly my-2 ml-[7rem] z-50 ">
                 <Image src={Logo} alt="" className="-mt-[0.5px]" />
-                <h3 className='logo text-3xl mt-[2px]'>TokenLAnd</h3>
+                <Link href='/'><h3 className='logo text-3xl mt-[2px]'>TokenLAnd</h3></Link>
 
                 <ShineBorder
                     className="text-center text-sm capitalize h-10 w-36 rounded-2xl z-50"
@@ -137,31 +143,33 @@ const Borrowtoken = () => {
                 <h3 className="text-[#545353] font-light mx-auto mb-[2rem]">Fill the information below to applay for the Loan</h3>
             </div>
             <div className="flex flex-wrap rounded-sm">
-                <div className="h-[25.5rem] w-[25rem] bg-white mx-auto mt-2 rounded-2xl flex-col px-2">
-                    <div className="flex justify-between ml-6 mt-4 mr-6">
-                        <h3 className="font-bold text-xl">Loan Form</h3>
-                        <h3 className="font-bold text-xl ">💸</h3>
+                <form className="mx-auto" >
+                    <div className="h-[25.5rem] w-[25rem] bg-white mx-auto mt-2 rounded-2xl flex-col px-2">
+                        <div className="flex justify-between ml-6 pt-4 mr-6">
+                            <h3 className="font-bold text-xl">Loan Form</h3>
+                            <h3 className="font-bold text-xl ">💸</h3>
+                        </div>
+                        <div className="mx-6 mt-2">
+                            <Label className="text-[#545353]">Amount For Loan</Label>
+                            <Input placeholder="Amount" className="mt-1" id="amount" />
+                        </div>
+                        <div className="mx-6 mt-2">
+                            <Label className="text-[#545353]">Collatral Description</Label>
+                            <Input placeholder="Describe your collatral here" className="mt-1" id="collatral" />
+                        </div>
+                        <div className="mx-6 mt-2">
+                            <Label className="text-[#545353]">For How Many Days</Label>
+                            <Input placeholder="Enter the number of days" className="mt-1" id="day" />
+                        </div>
+                        <div className="mx-6 mt-2">
+                            <Label className="text-[#545353]">Mobile Number</Label>
+                            <Input placeholder="7568245XXX" className="mt-1" id="num" />
+                        </div>
+                        <div className="mt-4 ml-6">
+                            <button type="submit" className="text-white bg-black rounded-2xl w-[21rem] h-[3rem] z-50 hover:cursor-pointer" onClick={handleSubmit}>Apply For Loan</button>
+                        </div>
                     </div>
-                    <div className="mx-6 mt-2">
-                        <Label className="text-[#545353]">Amount For Loan</Label>
-                        <Input placeholder="Amount" className="mt-1" id="amount" />
-                    </div>
-                    <div className="mx-6 mt-2">
-                        <Label className="text-[#545353]">Collatral Description</Label>
-                        <Input placeholder="Describe your collatral here" className="mt-1" id="collatral" />
-                    </div>
-                    <div className="mx-6 mt-2">
-                        <Label className="text-[#545353]">For How Many Days</Label>
-                        <Input placeholder="Enter the number of days" className="mt-1" id="day" />
-                    </div>
-                    <div className="mx-6 mt-2">
-                        <Label className="text-[#545353]">Mobile Number</Label>
-                        <Input placeholder="7568245XXX" className="mt-1" id="num" />
-                    </div>
-                    <div className="mt-4 ml-6">
-                        <button className="text-white bg-black rounded-2xl w-[21rem] h-[3rem] z-50 hover:cursor-pointer" onClick={handleSubmit}>Apply For Loan</button>
-                    </div>
-                </div>
+                </form>
             </div>
             <div className="relative -z-50">
                 <Image src={exp} alt="" className="-mt-[18rem] -z-50" />

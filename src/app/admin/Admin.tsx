@@ -72,7 +72,7 @@ const Admin = () => {
 
     return (
 
-        <div className="bg-[#F6FAFF] tablesection pb-[5rem] flex-col ">
+        <div className={`bg-[#F6FAFF] tablesection pb-[5rem] flex-col ${invoices.length == 0 ? 'h-[100vh]' : ''}`}>
             <div className="flex m-2 justify-evenly my-2 ml-[7rem]">
                 <Image src={Logo} alt="" className="-mt-[0.5px]" />
                 <h3 className='logo text-3xl mt-[2px]'>TokenLAnd</h3>
@@ -128,6 +128,7 @@ const Admin = () => {
                         </div>
                     </div>
                 ))}
+                {invoices.length == 0 ? <h3 className="text-[#63707D] text-5xl mx-auto mt-10 msg-admin">No Loan to approve </h3> : ''}
             </div>
         </div>
     );
