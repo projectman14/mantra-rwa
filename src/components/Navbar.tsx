@@ -19,15 +19,6 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ handleconnect , status , Homeref , Workingref , Aboutref , FAQref }) => {
 
 
-  // const handleconnect = () => {
-  //   window.keplr?.enable("mantra-hongbai-1");
-
-  //   console.log(window.keplr?.getKey("mantra-hongbai-1").then((keyInfo) => {
-  //     console.log(keyInfo.bech32Address);
-  //   }))
-  // }
-
-
   return (
     <div className='flex mx-20'>
       <div className='my-auto flex'>

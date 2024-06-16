@@ -1,2 +1,2 @@
-export * as LoanContractTypes from './LoanContract.types';
-export * from './LoanContract.client';
+export * as PaymasterTypes from './Paymaster.types';
+export * from './Paymaster.client';
