@@ -7,7 +7,8 @@
 * We've used ts code-gen to streamline building the frontend process.
 
 #### System Design (how it works)
-![architecture design](/mantra-rwa/public/system-design-readme.png "architecture design")
+![system-design-readme](https://github.com/projectman14/mantra-rwa/assets/138717001/4b16172a-574a-4e00-a38e-f00e985d6b00)
+
 
 #### Steps to run it locally
 
