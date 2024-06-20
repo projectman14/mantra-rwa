@@ -11,7 +11,7 @@ import { PaymasterfactoryClient , PaymasterfactoryQueryClient } from './codegen/
 
 
 
-const mnemonic = "furnace immense alarm eagle harsh hammer emerge barely street minor gloom debate"; //your memonic
+const mnemonic = "sunny metal burger rotate enemy front duck unaware nerve obscure next safe inflict zebra master mean donkey hockey bamboo session soon melody believe tiger"; //your memonic
 const contractAddress = "mantra163dn7sa2385k95p5ujjwv5vqazw3lgsghpatmtlchdcmnj6zfvgs8nk46q";
 
 async function connect() {

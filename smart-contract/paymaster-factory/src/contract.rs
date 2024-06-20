@@ -18,9 +18,11 @@ pub fn instantiate(
     deps: DepsMut,
     _env: Env,
     _info: MessageInfo,
-    _msg: InstantiateMsg,
+    msg: InstantiateMsg,
 ) -> Result<Response, ContractError> {
     set_contract_version(deps.storage, CONTRACT_NAME, CONTRACT_VERSION)?;
+
+    CODE_ID.save(deps.storage, &msg.code_id)?;
 
     Ok(Response::new().add_attribute("action", "Mint paymaster factory contract"))
 }
@@ -29,11 +31,11 @@ pub fn instantiate(
 pub fn execute(
     deps: DepsMut,
     _env: Env,
-    info: MessageInfo,
+    _info: MessageInfo,
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg{
-        ExecuteMsg::MintPaymasterAccount {  } => execute::mint_paymaster_account(deps, info),
+        ExecuteMsg::MintPaymasterAccount { address } => execute::mint_paymaster_account(deps, address),
     }
 }
 
@@ -45,16 +47,16 @@ pub mod execute{
         pub admin : Addr,
     }
 
-    pub fn mint_paymaster_account(deps : DepsMut, info : MessageInfo) -> Result<Response, ContractError>{
-        let paymaster_address = CONTRACTS.may_load(deps.storage, info.sender.to_owned())?;
+    pub fn mint_paymaster_account(deps : DepsMut, address : Addr) -> Result<Response, ContractError>{
+        let paymaster_address = CONTRACTS.may_load(deps.storage, address.to_owned())?;
 
         match paymaster_address{
             None => {
                 let contract_mint = MintMsg{
-                    admin : info.sender.to_owned(),
+                    admin : address.to_owned(),
                 };
 
-                let admin = info.sender.to_owned();
+                let admin = address.to_owned();
 
                 let mint_msg = SubMsg{
                     id : 1,

@@ -8,7 +8,7 @@ pub struct InstantiateMsg {
 
 #[cw_serde]
 pub enum ExecuteMsg {
-    MintPaymasterAccount { },
+    MintPaymasterAccount { address : Addr },
 }
 
 #[cw_serde]
