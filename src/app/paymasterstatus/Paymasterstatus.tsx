@@ -18,7 +18,7 @@ import { ContractInfo } from '../../../ts-codegen/dapp_loan_contract/src/codegen
 import { LoanContract } from '../../../ts-codegen/dapp/src/codegen/LoanDatabase.types'
 import { GetLoanDetails, GetRemanigPayment, AcceptLoanPayment } from '../../../ts-codegen/dapp_loan_contract/src/index';
 import { GiveLoan, GetLoanContratAddress } from '../../../ts-codegen/dapp_loan_database/src/index';
-import { GetPaymasterAccountInfo, MakePayMasterAccount } from '../../../ts-codegen/paymasterfactory/src/index';
+import { GetPaymasterAccountInfo, MakePayMasterAccount } from '../../../ts-codegen/paymasterfactorynew/src/index';
 import { GetPayment, SetAutopay } from '../../../ts-codegen/paymaster/src/index';
 import Link from 'next/link'
 
@@ -52,14 +52,16 @@ const Paymasterstatus = () => {
         });
     }, []);
 
-    useEffect(()=>{
-        const addr1 = GetPaymasterAccountInfo();
-        addr1.then((info2) => {
-            const finaladdr = info2.getPaymasterAddress({address:sender});
-            finaladdr.then((info3) => {
-                setAddrs(info3);
-            })
-        })
+    async function Getaddrs() {
+        console.log(sender+'HEllo')
+        const addr1 = await GetPaymasterAccountInfo();
+        const watchhow =await addr1.getPaymasterAddress({address : sender });
+        console.log(watchhow);
+        setAddrs(watchhow);
+      }
+
+    useEffect(() => {
+        Getaddrs();
     },[sender])
 
     const ReturnArray = async () => {
@@ -110,17 +112,19 @@ const Paymasterstatus = () => {
     }, [sender, []]);
 
     const getNanosecondsTimestamp = () => {
-        const now = Date.now(); // Current time in milliseconds since the Unix epoch
-        const highResTime = performance.now(); // High-resolution time in milliseconds with microsecond precision
-        const highResTimestamp = Math.floor((now * 1e6) + (highResTime * 1e3)); // Convert to nanoseconds
+        const now = Date.now(); 
+        const highResTime = performance.now();
+        const highResTimestamp = Math.floor((now * 1e6) + (highResTime * 1e3));
         return highResTimestamp;
     };
 
 
 
     async function getPaymasterstatus() {
-        const statuspaymaster = (await GetPayment(addrs)).getPayments();
-        statuspaymaster.then((info) => { setInvoices(info) ; console.log(invoices) })
+        const statuspaymaster = await GetPayment(addrs);
+        const valuearray = await statuspaymaster.getPayments();
+        console.log(valuearray.payments);
+        setInvoices(valuearray.payments);
     }
 
     useEffect(()=>{
@@ -158,7 +162,7 @@ const Paymasterstatus = () => {
                             <TableHead>Frequency</TableHead>
                             <TableHead>Amount for Autopay</TableHead>
                             <TableHead>Next Payment Date</TableHead>
-                            <TableHead>Remaning Amount</TableHead>
+                            <TableHead>Token Used For Payment</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

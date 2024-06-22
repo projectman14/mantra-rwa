@@ -288,20 +288,32 @@ const Hero: React.FC<HeroProps> = ({ Homeref, Workingref, Aboutref, FAQref }) =>
           </div>
         </div>
         {/*---- Button Special ------ */}
-        <div className='flex mt-20 ml-[36rem]'>
+        <div className='flex mt-20 ml-[28rem]'>
           <ShineBorder
             className="text-center align-middle text-base attractuser capitalize h-12 w-40 rounded-2xl mr-12 hover:cursor-pointer mt-6 pt-4"
             color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
           >
             <Link href='./borrowtoken' className='mt-[1rem]'>Borrow Token</Link>
-          </ShineBorder></div>
-      </div>
+          </ShineBorder>
+        </div>
 
-      <div className='bg-white z-50 p-[0.125rem] attractuser rounded-2xl w-40 h-12 mr-12 hover:cursor-pointer ml-[48rem] mt-[13.25rem] relative'>
-        <div className='bg-black rounded-xl text-white h-11 hover:cursor-pointer'>
-          <p className='text-base ml-4 pt-[0.6rem] hover:cursor-pointer z-50 ' ><Link href='/tablesection' className='text-white'>List Loan Status</Link></p>
+        <div className='bg-white z-50 p-[0.125rem] attractuser rounded-2xl w-40 h-12 mr-12 hover:cursor-pointer ml-[41rem] -mt-[3rem] relative'>
+          <div className='bg-black rounded-xl text-white h-11 hover:cursor-pointer'>
+            <p className='text-base ml-4 pt-[0.6rem] hover:cursor-pointer z-50 ' ><Link href='/tablesection' className='text-white'>List Loan Status</Link></p>
+          </div>
+        </div>
+
+        <div className='flex -mt-[4.5rem] ml-[54rem]'>
+          <ShineBorder
+            className="text-center align-middle text-base attractuser capitalize h-12 w-40 rounded-2xl mr-12 hover:cursor-pointer mt-6 pt-4"
+            color={["#A07CFE", "#FE8FB5", "#FFBE7B"]}
+          >
+            <Link href='./paymaster' className='mt-[1rem]'>PayMaster</Link>
+          </ShineBorder>
         </div>
       </div>
+
+
 
     </div>
   );

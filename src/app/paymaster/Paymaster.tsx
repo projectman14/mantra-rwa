@@ -5,37 +5,50 @@ import Github from "../../../public/github";
 import Twitter from "../../../public/twitter";
 import { Backpack, Sparkles } from "lucide-react";
 import Link from "next/link";
-import { GetPaymasterAccountInfo , MakePayMasterAccount } from "../../../ts-codegen/paymasterfactory/src";
+import { GetPaymasterAccountInfo , MakePayMasterAccount } from "../../../ts-codegen/paymasterfactorynew/src";
+import { send } from "process";
 
 export default function Paymaster() {
 
-  const [sender, setSender] = useState("");
+  const [sender, setSender] = useState('');
   const [addrs, setAddrs] = useState('no');
 
   useEffect(() => {
     window.keplr?.getKey("mantra-hongbai-1").then((keyInfo) => {
       console.log("HI HI", keyInfo.bech32Address);
-      setAllowparams(true);
       setSender(keyInfo.bech32Address);
+      console.log('Hello'+sender);
     });
   }, []);
 
 
-  useEffect(() => {
-    const addr1 = GetPaymasterAccountInfo();
-    addr1.then((info2) => {
-      const finaladdr = info2.getPaymasterAddress({ address: sender });
-      finaladdr.then((info3) => {
-        setAddrs(info3);
-        console.log(addrs);
-      })
-    })
-  }, [sender])
+ 
 
-  async function makeone(){
-    (await MakePayMasterAccount(sender)).mintPaymasterAccount();
+  async function Getaddrs() {
+    console.log(sender+'HEllo')
+    const addr1 = await GetPaymasterAccountInfo();
+    const watchhow =await addr1.getPaymasterAddress({address : sender });
+    console.log(watchhow);
+    setAddrs(sender);
+  }
+
+  useEffect(() => {
+    // const addr1 = await GetPaymasterAccountInfo();
+    Getaddrs();
+    
+  }, [sender , []])
+
+  async function makeone(walletaddress:string){
+    const finalfn = await MakePayMasterAccount();
+    const newfinal = finalfn.mintPaymasterAccount({address: walletaddress});
+    console.log(newfinal);
+    console.log('sucess');
     setSender(sender);
   }
+
+    // useEffect( () => {
+    //   makeone('mantra16xxvu843zv9k7p352tmpe008txfkzd2qh6vt8h')
+    // },[])
 
   return (
     <div className="z-10 w-[100vw]  px-5 xl:px-0 fixed h-screen bg-gradient-to-br from-indigo-50 via-white to-cyan-100">
@@ -76,18 +89,18 @@ export default function Paymaster() {
       >
         <a
           className="group flex max-w-fit items-center justify-center space-x-2 rounded-full border border-black bg-black px-5 py-2 text-sm text-white transition-colors hover:bg-white hover:text-black"
-          href="#"
-          style={{ display: addrs === 'no' ? 'none' : 'block' }}
+          href="/paymasterstatus"
+          style={{ display: addrs === 'no' ? 'none' : '' }}
         >
           <Sparkles />
           <p className={`${addrs == 'no' ? 'display: none' : ''}`}>PayMaster Status</p>
         </a>
         <Link
           className="flex max-w-fit items-center justify-center space-x-2 rounded-full border border-gray-300 bg-white px-5 py-2 text-sm text-gray-600 shadow-md transition-colors hover:border-gray-800"
-          href=""
+          href="/activepaymaster"
           target="_blank"
           rel="noopener noreferrer"
-          style={{ display: addrs === 'no' ? 'none' : 'block' }}
+          style={{ display: addrs === 'no' ? 'none' : '' }}
         >
           <Backpack />
           <p className={`${addrs == 'no' ? 'display: none' : ''}`} >Get Me One</p>
@@ -97,14 +110,10 @@ export default function Paymaster() {
           href="#"
           style={{ display: addrs != 'no' ? 'none' : 'block' }}
         >
-          <p className={''} onClick={makeone}>Firest Setup Paymaster</p>
+          <p className={''} onClick={() => {makeone(sender)}}>First Setup Paymaster</p>
         </a>
 
       </div>
     </div>
   );
-}
-
-function setAllowparams(arg0: boolean) {
-  throw new Error("Function not implemented.");
 }

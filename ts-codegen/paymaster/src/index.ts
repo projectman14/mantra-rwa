@@ -12,7 +12,7 @@ import { PaymasterClient , PaymasterQueryClient } from './codegen/Paymaster.clie
 
 
 const mnemonic = "fuel grunt humor output offer box bridge hover motor code spoon token have order grief medal sport bulk corn pave market insane access urge";
-const contractAddress = "mantra163dn7sa2385k95p5ujjwv5vqazw3lgsghpatmtlchdcmnj6zfvgs8nk46q";
+// const contractAddress = "mantra163dn7sa2385k95p5ujjwv5vqazw3lgsghpatmtlchdcmnj6zfvgs8nk46q";
 
 async function connect() {
 

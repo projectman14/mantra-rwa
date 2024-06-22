@@ -18,7 +18,7 @@ import { ContractInfo } from '../../../ts-codegen/dapp_loan_contract/src/codegen
 import { LoanContract } from '../../../ts-codegen/dapp/src/codegen/LoanDatabase.types'
 import { GetLoanDetails, GetRemanigPayment, AcceptLoanPayment } from '../../../ts-codegen/dapp_loan_contract/src/index';
 import { GiveLoan, GetLoanContratAddress } from '../../../ts-codegen/dapp_loan_database/src/index';
-import { GetPaymasterAccountInfo, MakePayMasterAccount } from '../../../ts-codegen/paymasterfactory/src/index';
+import { GetPaymasterAccountInfo, MakePayMasterAccount } from '../../../ts-codegen/paymasterfactorynew/src/index';
 import { GetPayment, SetAutopay } from '../../../ts-codegen/paymaster/src/index';
 import Link from 'next/link'
 
@@ -111,7 +111,11 @@ const Activepaymaster = () => {
         const frequencyEle = document.getElementById(`frequency_${Contractindex}`) as HTMLInputElement;
         const amountval = amountEle.value;
         const frequencyval = frequencyEle.value;
-        const settranx = (await SetAutopay(addrs)).addPayment({ amount: amountval, decimals: Number('6'), frequencyInDays: Number(frequencyval), tokenAddress: "mantra1pnh86g85r45er4egge6lhr0svu4nrga4ny7ax06wqgkjq8zgdjtsr7nzve", tokenSymbol: "PBK", receiver: contractArrayCopy[Contractindex].address, startDate: start_date });
+        const settranx = await SetAutopay(addrs);
+        const finalwork = await settranx.addPayment({ amount: amountval, decimals: Number('6'), frequencyInDays: Number(frequencyval), tokenAddress: "mantra1pnh86g85r45er4egge6lhr0svu4nrga4ny7ax06wqgkjq8zgdjtsr7nzve", tokenSymbol: "PBK", receiver: contractArrayCopy[Contractindex].address, startDate: start_date });
+        console.log(finalwork);
+        frequencyEle.value = '';
+        amountEle.value = '';
     }
 
 
